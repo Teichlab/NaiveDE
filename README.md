@@ -1,6 +1,7 @@
 This package implements the simplest form of a Differential Expression test.
 It just fits two linear models, assuming Normally distributed residuals, to
-each gene.
+each gene. These are assumed to be nested, and a likelihood ratio test is
+then performed to compare the models.
 
 The test might have low power and give noisy results, but it shouldn't be
 biased. With many (i.e. hundreds of) samples it should work all right.
