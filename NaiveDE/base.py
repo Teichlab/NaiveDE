@@ -60,13 +60,14 @@ def regress_out(sample_info, expression_matrix, covariate_formula, design_formul
     '''
     # Ensure intercept is not part of covariates
     covariate_formula += ' - 1'
+
     covariate_matrix = patsy.dmatrix(covariate_formula, sample_info)
     design_matrix = patsy.dmatrix(design_formula, sample_info)
 
     design_batch = np.hstack((design_matrix, covariate_matrix))
 
     coefficients, res, rank, s = np.linalg.lstsq(design_batch, expression_matrix.T)
-    beta = coefficients[-design_matrix.shape[1]][:, None]
-    regressed = expression_matrix - beta.dot(covariate_matrix.T)
+    beta = coefficients[design_matrix.shape[1]:]
+    regressed = expression_matrix - covariate_matrix.dot(beta).T
 
     return regressed
