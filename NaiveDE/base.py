@@ -55,7 +55,7 @@ def lr_tests(sample_info, expression_matrix, full_model, reduced_model='expressi
     return fit_results
 
 
-def regress_out(sample_info, expression_matrix, covariate_formula, design_formula='1'):
+def regress_out(sample_info, expression_matrix, covariate_formula, design_formula='1', rcond=-1):
     ''' Implementation of limma's removeBatchEffect function
     '''
     # Ensure intercept is not part of covariates
@@ -66,7 +66,7 @@ def regress_out(sample_info, expression_matrix, covariate_formula, design_formul
 
     design_batch = np.hstack((design_matrix, covariate_matrix))
 
-    coefficients, res, rank, s = np.linalg.lstsq(design_batch, expression_matrix.T)
+    coefficients, res, rank, s = np.linalg.lstsq(design_batch, expression_matrix.T, rcond=rcond)
     beta = coefficients[design_matrix.shape[1]:]
     regressed = expression_matrix - covariate_matrix.dot(beta).T
 
