@@ -1,0 +1,9 @@
+setup.py
+NaiveDE/__init__.py
+NaiveDE/base.py
+NaiveDE/faux_fold_change.py
+NaiveDE.egg-info/PKG-INFO
+NaiveDE.egg-info/SOURCES.txt
+NaiveDE.egg-info/dependency_links.txt
+NaiveDE.egg-info/requires.txt
+NaiveDE.egg-info/top_level.txt

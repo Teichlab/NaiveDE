@@ -71,3 +71,16 @@ def regress_out(sample_info, expression_matrix, covariate_formula, design_formul
     regressed = expression_matrix - covariate_matrix.dot(beta).T
 
     return regressed
+
+
+def stabilize(expression_matrix):
+    ''' Use Anscombes approximation to variance stabilize Negative Binomial data
+
+    See https://f1000research.com/posters/4-1041 for motivation.
+
+    Assumes columns are samples, and rows are genes
+    '''
+    from scipy import optimize
+    phi_hat, _ = optimize.curve_fit(lambda mu, phi: mu + phi * mu ** 2, expression_matrix.mean(1), expression_matrix.var(1))
+
+    return np.log(expression_matrix + 1. / (2 * phi_hat[0]))
