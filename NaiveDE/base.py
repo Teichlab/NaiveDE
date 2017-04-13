@@ -17,12 +17,12 @@ def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=
     alt_design  = patsy.dmatrix(alt_model, sample_info, return_type='dataframe')
     null_design = patsy.dmatrix(null_model, sample_info, return_type='dataframe')
     
-    beta_alt,  res_alt,  rank_alt,  s_alt = np.linalg.lstsq(alt_design, expression_matrix, rcond=rcond)
-    beta_null, res_null, rank_null, s_null = np.linalg.lstsq(null_design, expression_matrix, rcond=rcond)
+    beta_alt,  res_alt,  rank_alt,  s_alt = np.linalg.lstsq(alt_design, expression_matrix.T, rcond=rcond)
+    beta_null, res_null, rank_null, s_null = np.linalg.lstsq(null_design, expression_matrix.T, rcond=rcond)
     
-    results = pd.DataFrame(beta_alt.T, columns=alt_design.columns, index=expression_matrix.columns)
+    results = pd.DataFrame(beta_alt.T, columns=alt_design.columns, index=expression_matrix.index)
     
-    n = expression_matrix.shape[0]
+    n = expression_matrix.shape[1]
     ll_alt  = -n / 2. * np.log(2 * np.pi) - n / 2. * np.ma.log(res_alt  / n) - n / 2.
     ll_null = -n / 2. * np.log(2 * np.pi) - n / 2. * np.ma.log(res_null / n) - n / 2.
     
