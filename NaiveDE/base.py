@@ -1,58 +1,40 @@
 import numpy as np
 import pandas as pd
-
-import statsmodels.formula.api as smf
-from statsmodels.sandbox.stats.multicomp import multipletests
-
-from tqdm import tqdm
-
 import patsy
+from scipy import stats
 
-def lr_tests(sample_info, expression_matrix, full_model, reduced_model='expression ~ 1'):
-    ''' Compare full_model and reduced_model by a Likelihood Ratio Test
-    for every gene in the expression_matrix.
+
+def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=-1):
+    ''' Compare alt_model and null_model by a Likelihood Ratio Test for every
+    gene in the expression_matrix.
+    
+    Assumes columns are samples, and rows are genes.
+    
+    OLS Regression assumes data is variance stabilized. E.g. log scaled.
+    
+    Returns a DataFrame with alt_model weights and p-values.
     '''
-    tmp = sample_info.copy()
-
-    fit_results = pd.DataFrame(index=expression_matrix.index)
-
-    gene = expression_matrix.index[0]
-    tmp['expression'] = expression_matrix.ix[gene]
-    m1 = smf.ols(full_model, tmp).fit()
-    m2 = smf.ols(reduced_model, tmp).fit()
-
-    for param in m1.params.index:
-        fit_results['full ' + param] = np.nan
-
-    params = m1.params.add_prefix('full ')
-    fit_results.ix[gene, params.index] = params
-
-    for param in m2.params.index:
-        fit_results['reduced ' + param] = np.nan
-
-    params = m2.params.add_prefix('reduced ')
-    fit_results.ix[gene, params.index] = params
-
-    fit_results['pval'] = np.nan
-
-    fit_results.ix[gene, 'pval'] = m1.compare_lr_test(m2)[1]
-
-    for gene in tqdm(expression_matrix.index[1:]):
-        tmp['expression'] = expression_matrix.ix[gene]
-
-        m1 = smf.ols(full_model, tmp).fit()
-        params = m1.params.add_prefix('full ')
-        fit_results.ix[gene, params.index] = params
-
-        m2 = smf.ols(reduced_model, tmp).fit()
-        params = m2.params.add_prefix('reduced ')
-        fit_results.ix[gene, params.index] = params
-
-        fit_results.ix[gene, 'pval'] = m1.compare_lr_test(m2)[1]
-
-    fit_results['qval'] = multipletests(fit_results['pval'], method='b')[1]
-
-    return fit_results
+    alt_design  = patsy.dmatrix(alt_model, sample_info, return_type='dataframe')
+    null_design = patsy.dmatrix(null_model, sample_info, return_type='dataframe')
+    
+    beta_alt,  res_alt,  rank_alt,  s_alt = np.linalg.lstsq(alt_design, expression_matrix, rcond=rcond)
+    beta_null, res_null, rank_null, s_null = np.linalg.lstsq(null_design, expression_matrix, rcond=rcond)
+    
+    results = pd.DataFrame(beta_alt.T, columns=alt_design.columns, index=expression_matrix.columns)
+    
+    n = expression_matrix.shape[0]
+    ll_alt  = -n / 2. * np.log(2 * np.pi) - n / 2. * np.ma.log(res_alt  / n) - n / 2.
+    ll_null = -n / 2. * np.log(2 * np.pi) - n / 2. * np.ma.log(res_null / n) - n / 2.
+    
+    llr = ll_alt - ll_null
+    
+    pval = stats.chi2.sf(2 * llr, df=beta_alt.shape[0] - beta_null.shape[0])
+    pval[llr.mask] = 1.
+    
+    results['pval'] = pval
+    results['qval'] = (results['pval'] * n).clip_upper(1.)
+    
+    return results
 
 
 def regress_out(sample_info, expression_matrix, covariate_formula, design_formula='1', rcond=-1):
