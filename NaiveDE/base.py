@@ -29,7 +29,7 @@ def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=
     llr = ll_alt - ll_null
     
     pval = stats.chi2.sf(2 * llr, df=beta_alt.shape[0] - beta_null.shape[0])
-    pval[llr.mask] = 1.
+    pval = np.ma.MaskedArray(pval, mask=llr.mask).filled(1.)
     
     results['pval'] = pval
     results['qval'] = (results['pval'] * n).clip_upper(1.)
