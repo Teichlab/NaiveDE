@@ -6,11 +6,11 @@ def readme():
 
 setup(
         name='NaiveDE',
-        version='1.0.0',
+        version='1.1.0',
         description='The most trivial DE test based on likelihood ratio tests',
         long_description=readme(),
         packages=find_packages(),
-        install_requires=['numpy', 'pandas', 'statsmodels', 'tqdm'],
+        install_requires=['numpy', 'pandas'],
         author='Valentine Svensson',
         author_email='valentine@nxn.se',
         license='MIT'
