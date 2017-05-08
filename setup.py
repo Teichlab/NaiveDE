@@ -6,7 +6,7 @@ def readme():
 
 setup(
         name='NaiveDE',
-        version='1.1.0',
+        version='1.1.1',
         description='The most trivial DE test based on likelihood ratio tests',
         long_description=readme(),
         packages=find_packages(),
