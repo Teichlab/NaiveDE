@@ -89,6 +89,5 @@ def vst(expression_matrix):
     from scipy import optimize
     v = lambda mu, phi: mu + phi * mu ** 2
     phi_hat, _ = optimize.curve_fit(v, expression_matrix.mean(1), expression_matrix.var(1))
-    print(phi_hat)
 
     return 2 * np.arcsinh(np.sqrt(phi_hat[0] * expression_matrix)) / np.sqrt(phi_hat[0])
