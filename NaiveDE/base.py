@@ -66,3 +66,21 @@ def stabilize(expression_matrix):
     phi_hat, _ = optimize.curve_fit(lambda mu, phi: mu + phi * mu ** 2, expression_matrix.mean(1), expression_matrix.var(1))
 
     return np.log(expression_matrix + 1. / (2 * phi_hat[0]))
+
+def anscombe(exppression_matrix):
+    return stabilize(expression_matrix)
+
+
+def vst(expression_matrix):
+    ''' A VST derived from assumption of a global NB phi parameter for all genes.
+
+    Defined by symbolic integral as described in http://www.bioconductor.org/packages//2.13/bioc/vignettes/DESeq/inst/doc/vst.pdf
+
+    Unlike the `stabilize` function, results here will be non-negative.
+    '''
+    from scipy import optimize
+    v = lambda mu, phi: mu + phi * mu ** 2
+    phi_hat, _ = optimize.curve_fit(v, expression_matrix.mean(1), expression_matrix.var(1))
+    print(phi_hat)
+
+    return 2 * np.arcsinh(np.sqrt(phi_hat[0] * expression_matrix)) / np.sqrt(phi_hat[0])
