@@ -68,6 +68,12 @@ def stabilize(expression_matrix):
     return np.log(expression_matrix + 1. / (2 * phi_hat[0]))
 
 def anscombe(exppression_matrix):
+    ''' Use Anscombes approximation to variance stabilize Negative Binomial data
+
+    See https://f1000research.com/posters/4-1041 for motivation.
+
+    Assumes columns are samples, and rows are genes
+    '''
     return stabilize(expression_matrix)
 
 
@@ -77,6 +83,8 @@ def vst(expression_matrix):
     Defined by symbolic integral as described in http://www.bioconductor.org/packages//2.13/bioc/vignettes/DESeq/inst/doc/vst.pdf
 
     Unlike the `stabilize` function, results here will be non-negative.
+
+    Assumes columns are samples, and rows are genes
     '''
     from scipy import optimize
     v = lambda mu, phi: mu + phi * mu ** 2
