@@ -80,9 +80,12 @@ def anscombe(exppression_matrix):
 def vst(expression_matrix):
     ''' A VST derived from assumption of a global NB phi parameter for all genes.
 
+    Var(mu) = mu + phi * mu^2
+
     Defined by symbolic integral as described in http://www.bioconductor.org/packages//2.13/bioc/vignettes/DESeq/inst/doc/vst.pdf
 
-    Unlike the `stabilize` function, results here will be non-negative.
+    Unlike the `stabilize` function, results here will be non-negative. This also
+    assumes phi > 0.
 
     Assumes columns are samples, and rows are genes
     '''
