@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import pandas as pd
 from scipy import stats
 
 
@@ -26,7 +27,10 @@ def simulate_cell_types(num_clusters, num_cells, num_markers_per_cluster, num_bg
         c_slice = np.s_[cluster * cells_per_cluster:(cluster + 1) * cells_per_cluster]
         data[c_slice, :] = stats.multivariate_normal(mu, Sigma).rvs(cells_per_cluster)
 
-    return softplus(data)
+    expression = pd.DataFrame.from_records(softplus(data))
+    expression = expression.T.add_prefix('cell_') \
+                           .T.add_prefix('gene_')
+    return expression
 
 
 def plot_data(data):
