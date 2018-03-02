@@ -41,3 +41,15 @@ def plot_roc(y_prob, y_test, lr):
     plt.ylabel('TPR')
 
 
+def get_top_markers(lr_res, N):
+    top_markers = \
+    lr_res \
+        .assign(cluster=lr_res.index) \
+        .melt(id_vars=['cluster'], var_name='gene', value_name='weight') \
+        .sort_values('weight', ascending=False) \
+        .groupby('cluster') \
+        .head(N) \
+        .sort_values(['cluster', 'weight'], ascending=[True, False])
+
+    return top_markers
+
