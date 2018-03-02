@@ -53,3 +53,24 @@ def get_top_markers(lr_res, N):
 
     return top_markers
 
+
+def plot_marker_map(data, cell_types, top_markers):
+    sizes = pd.Series(cell_types, index=data.index).value_counts()
+    c_idx = pd.Series(cell_types, index=data.index).map(sizes).sort_values(ascending=False).index
+
+    g_idx = top_markers \
+        .assign(sizes=top_markers.cluster.map(sizes)) \
+        .sort_values('sizes', ascending=False) \
+        .gene[::-1]
+
+    marker_map = data.reindex(index=c_idx, columns=g_idx)
+
+    plt.pcolormesh(marker_map.T, cmap=cm.gray_r)
+    plt.colorbar(label='Expression')
+
+    for vl in sizes.cumsum():
+        plt.axvline(vl, lw=0.66, c='r')
+
+    plt.ylabel('Marker genes')
+    plt.xlabel('Cells')
+
