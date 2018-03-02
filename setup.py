@@ -4,6 +4,9 @@ def readme():
     with open('README.md') as f:
         return f.read()
 
+
+print(find_packages())
+
 setup(
         name='NaiveDE',
         version='1.1.1',
