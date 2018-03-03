@@ -19,19 +19,23 @@ def logistic_model(data, cell_types, sparsity=0.2, fraction=0.5):
 
     print((lr.coef_ > 0).sum(1))
 
-    lr_res = pd.DataFrame.from_records(lr.coef_, columns=data.columns)
+    lr_res = pd.DataFrame.from_records(lr.coef_, columns=X.columns)
 
     return y_prob, y_test, lr_res, lr
 
 
-def plot_roc(y_prob, y_test, lr):
-    # Create colors
+def create_colors(lr):
     n_cts = lr.classes_.shape[0]
     color_norm = colors.Normalize(vmin=-n_cts / 3, vmax=n_cts)
     ct_arr = np.arange(n_cts)
     ct_colors = cm.YlOrRd(color_norm(ct_arr))
 
-    # Make plot
+    return ct_colors
+
+
+def plot_roc(y_prob, y_test, lr):
+    ct_colors = create_colors(lr)
+
     for i, cell_type in enumerate(lr.classes_):
         fpr, tpr, _ = metrics.roc_curve(y_test == cell_type, y_prob[:, i])
         plt.plot(fpr, tpr, c=ct_colors[i], lw=2)
@@ -74,3 +78,21 @@ def plot_marker_map(data, cell_types, top_markers):
     plt.ylabel('Marker genes')
     plt.xlabel('Cells')
 
+
+def plot_marker_table(top_markers, lr, n_columns=5, max_rows=10):
+    ct_colors = create_colors(lr)
+
+    for i, m in enumerate(top_markers['cluster'].unique()):
+        plt.subplot(10, 5, i + 1)
+        g = top_markers.query('cluster == @m')
+        plt.title(m, size=12, weight='bold', ha='left')
+        for j, gn in enumerate(g.iterrows()):
+            _, gn = gn
+            plt.annotate(f'{gn.weight:.2f} - {gn.gene}', (0, 0.2 * j), )
+
+        plt.axis('off')
+        plt.ylim(6 * 0.2, -0.2)
+        ax = plt.gca()
+        ax.plot([0.5, 1], [1, 1], transform=ax.transAxes, lw=3, c=ct_colors[i])
+
+    plt.tight_layout()
