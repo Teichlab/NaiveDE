@@ -32,7 +32,7 @@ def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=
     pval = np.ma.MaskedArray(pval, mask=llr.mask).filled(1.)
     
     results['pval'] = pval
-    results['qval'] = (results['pval'] * n).clip_upper(1.)
+    results['qval'] = (results['pval'] * results.shape[0]).clip_upper(1.)
     
     return results
 
