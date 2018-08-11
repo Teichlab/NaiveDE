@@ -91,8 +91,36 @@ def plot_marker_table(top_markers, lr, n_columns=5, max_rows=10):
             plt.annotate(f'{gn.weight:.2f} - {gn.gene}', (0, 0.2 * j), )
 
         plt.axis('off')
-        plt.ylim(6 * 0.2, -0.2)
+        plt.ylim((n_columns + 1) * 0.2, -0.2)
         ax = plt.gca()
         ax.plot([0.5, 1], [1, 1], transform=ax.transAxes, lw=3, c=ct_colors[i])
 
     plt.tight_layout()
+
+
+def html_marker_table(top_markers, n_columns=5):
+    html_str = '<table>'
+    for i, m in enumerate(top_markers['cluster'].unique()):
+        if i % n_columns == 0:
+            html_str += '<tr>'
+            
+        html_str += '<td style="text-align: left;"><pre>'
+        g = top_markers.query('cluster == @m')
+        html_str += f'{m}\n-----\n'
+        for j, gn in enumerate(g.iterrows()):
+            _, gn = gn
+            if gn.weight == 0:
+                html_str += '\n'
+                continue
+
+            html_str += f'{gn.weight:.2}\t{gn.gene}\n'
+            
+        html_str += '</pre></td>'
+        
+        if i % n_columns == n_columns - 1:
+            html_str += '</tr>'
+            
+    html_str += '</table>'
+        
+    return html_str
+
