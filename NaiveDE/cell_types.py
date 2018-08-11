@@ -83,7 +83,7 @@ def plot_marker_table(top_markers, lr, n_columns=5, max_rows=10):
     ct_colors = create_colors(lr)
 
     for i, m in enumerate(top_markers['cluster'].unique()):
-        plt.subplot(10, 5, i + 1)
+        plt.subplot(max_rows, n_columns, i + 1)
         g = top_markers.query('cluster == @m')
         plt.title(m, size=12, weight='bold', ha='left')
         for j, gn in enumerate(g.iterrows()):

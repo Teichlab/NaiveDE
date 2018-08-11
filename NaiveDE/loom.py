@@ -34,7 +34,7 @@ def lr_tests(ds, alt_model, null_model='~ 1', gene_column='Gene', batch_size=200
     betas = []
     pvals = []
 
-    total_batches = np.ceil(ds.shape[0] / batch_size)
+    total_batches = np.ceil(ds.shape[0] / batch_size).astype(int)
     for (ix, selection, vals) in tqdm(ds.scan(axis=0, batch_size=batch_size), total=total_batches):
         expression_matrix = transformation(vals[:, :])
         beta_alt, res_alt, rank_alt, s_alt = np.linalg.lstsq(alt_design, expression_matrix.T, rcond=rcond)
