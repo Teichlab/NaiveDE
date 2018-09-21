@@ -20,6 +20,12 @@ def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=
     beta_alt,  res_alt,  rank_alt,  s_alt = np.linalg.lstsq(alt_design, expression_matrix.T, rcond=rcond)
     beta_null, res_null, rank_null, s_null = np.linalg.lstsq(null_design, expression_matrix.T, rcond=rcond)
 
+    if res_alt.shape[0] == 0:
+        res_alt = np.sum(np.square(expression_matrix.T - alt_design.dot(beta_alt))).values
+
+    if res_null.shape[0] == 0:
+        res_null = np.sum(np.square(expression_matrix.T - null_design.dot(beta_null))).values
+
     if genes is None:
         genes = expression_matrix.index
     
