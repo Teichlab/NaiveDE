@@ -4,7 +4,7 @@ import patsy
 from scipy import stats
 
 
-def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=-1):
+def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=-1, genes=None):
     ''' Compare alt_model and null_model by a Likelihood Ratio Test for every
     gene in the expression_matrix.
     
@@ -19,8 +19,11 @@ def lr_tests(sample_info, expression_matrix, alt_model, null_model='~ 1', rcond=
     
     beta_alt,  res_alt,  rank_alt,  s_alt = np.linalg.lstsq(alt_design, expression_matrix.T, rcond=rcond)
     beta_null, res_null, rank_null, s_null = np.linalg.lstsq(null_design, expression_matrix.T, rcond=rcond)
+
+    if genes is None:
+        genes = expression_matrix.index
     
-    results = pd.DataFrame(beta_alt.T, columns=alt_design.columns, index=expression_matrix.index)
+    results = pd.DataFrame(beta_alt.T, columns=alt_design.columns, index=genes)
     
     n = expression_matrix.shape[1]
     ll_alt  = -n / 2. * np.log(2 * np.pi) - n / 2. * np.ma.log(res_alt  / n) - n / 2.
