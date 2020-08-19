@@ -9,7 +9,7 @@ print(find_packages())
 
 setup(
         name='NaiveDE',
-        version='1.1.1',
+        version='1.3.1',
         description='The most trivial DE test based on likelihood ratio tests',
         long_description=readme(),
         packages=find_packages(),
